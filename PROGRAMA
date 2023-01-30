@@ -1,0 +1,117 @@
+
+//configuração do PORT
+sbit LCD_EN at RB0_bit;
+sbit LCD_RW at RB1_bit;
+sbit LCD_RS at RB2_bit;
+sbit LCD_D4 at RB4_bit;
+sbit LCD_D5 at RB5_bit;
+sbit LCD_D6 at RB6_bit;
+sbit LCD_D7 at RB7_bit;
+// configuração do TRIS
+sbit LCD_EN_Direction at TRISB0_bit;
+sbit LCD_RW_Direction at TRISB1_bit;
+sbit LCD_RS_Direction at TRISB2_bit;
+sbit LCD_D4_Direction at TRISB4_bit;
+sbit LCD_D5_Direction at TRISB5_bit;
+sbit LCD_D6_Direction at TRISB4_bit;
+sbit LCD_D7_Direction at TRISB7_bit;void main(){
+//==================================================
+//variaveis
+//potenciometro
+int leitura;
+float valor;
+char texto[16];//para ter texto//contador
+//int T;
+int x=0;
+char conversao [8];
+//==================================================
+TRISB = 0; //configura PORT saída
+TRISC = 0; //configura PORT saída
+TRISD = 0;
+ADCON0 = 0x0A;//porta analogicaTRISC.f0 = 0; //liga e desliga
+TRISC.f1 = 0; //sentido horario
+TRISC.f2 = 0;//sentido anti horario
+TRISC.f3 = 0;//automaticoLcd_init(); //inicia LCD
+Lcd_Cmd(_LCD_Clear);
+Lcd_Cmd(_LCD_CURSOR_OFF); //desliga cursor
+Lcd_Out(1, 1, " THIAGO ARBIGAUS "); //escreve texto
+Lcd_Out(2, 1, " somativa "); //escreve texto
+delay_ms(1000);
+Lcd_Cmd(_LCD_Clear);
+while(1){  portd.f6 = 0; //motor  portd.f7 = 0;//motor anti      
+//==================================================
+/*
+//contador
+delay_ms(1000);
+inttostr(x,conversao);x++;    */
+//==================================================//==================================================
+//LIGA E DESLIGA
+if (portc.f0 = 1){  portd.f0 = 1;//vai ligar
+//portd.f1 = 1;
+//portd.f2 = 1 ;  Lcd_Cmd(_LCD_CURSOR_OFF); //desliga cursor  //Lcd_Cmd(_LCD_CLEAR); //------  Lcd_Out(1, 1, "   ligado             ");  Lcd_Out(2, 1, "   TUDO LIGADO ");}else{  portd.f0 = 0;//vai desligar
+//desligar sentidos  portd.f6 = 0; //motor  portd.f7 = 0;//motor  Lcd_Cmd(_LCD_CURSOR_OFF); //desliga cursor  Lcd_Cmd(_LCD_CLEAR); //------  Lcd_Out(1, 1, "   Desligado  ");  Lcd_Out(2, 1, "   PAROU TUDO ");  delay_ms(2000);
+}
+//==================================================
+//==================================================
+//SENTIDO HORARIO
+if (portc.f1 = 1){  portd.f1 = 0;
+}else{  portd.f1 = 1;  portd.f6 = 1;  //vai lgiar o motor  portd.f7 = 0;  //desligar o sentido anti horario  Lcd_Cmd(_LCD_CLEAR); //--------  Lcd_Cmd(_LCD_CURSOR_OFF); //desliga cursor  Lcd_Out(2, 1, "   HORARIO  ");  delay_ms(1000);
+}
+//==================================================
+//==================================================
+//SENTIDO ANTI
+if (portc.f2 = 1){  portd.f2 = 0;
+}
+else{  portd.f2 = 1;  portd.f6 = 0;  portd.f7 = 1;  Lcd_Cmd(_LCD_CLEAR); //-----  Lcd_Cmd(_LCD_CURSOR_OFF); //desliga cursor  Lcd_Out(2, 1, "ANTI HORARIO  ");  delay_ms(1000);
+}
+//==================================================
+//==================================================
+//contador
+/*
+delay_ms(1000);
+inttostr(x,conversao);
+x++;  if (x==101)
+{
+x=0;
+}
+*/
+//================================================== //CONVERTER O VALOR tempertura
+leitura = adc_read(0);//vai ler a porta analogica 0
+valor = leitura * 0.0048;//converter para escala certa
+//transforma valor flutuante em texto da temperatura
+floattostr(valor,texto);//==================================================
+//MODO AUTOMATICO
+if (portc.f3 = 1){
+portd.f3 = 0;//led
+}
+else{
+portd.f3 = 1;
+//=============================================================
+//transformar valor do contador
+inttostr(x,conversao);
+//============================================================ //MENSAGEM DO LCD
+Lcd_Cmd(_LCD_CLEAR);
+Lcd_Cmd(_LCD_CURSOR_OFF);
+Lcd_Out(1, 1, "temperatura:");
+Lcd_Out(1, 14, texto);
+Lcd_Out(2, 1, "contador: 4s");
+delay_ms(1000);
+}
+//============================================================
+//============================================================
+//PARA FAZER O FORNO FINCIONAR
+if (valor >= 4){  portd.f6 = 1; //vai mover ate o lugar  delay_ms(2000);    portd.f6 = 0;//desligar por 4 segundos para acionar o forno  delay_ms(4000);    portd.f7 = 1;//vai levar o objeto de volta  delay_ms(2000);
+/*//mensagem  quando funcionar
+Lcd_Cmd(_LCD_CLEAR);
+Lcd_Cmd(_LCD_CURSOR_OFF);
+Lcd_Out(1, 1, "Iniciando ");
+Lcd_Out(2, 1, "Processo");
+delay_ms(8000);
+*/
+}
+//==================================================
+}//fim do while
+//================================================== //ajustador do contador (tempo em que a peça vai ficar dentro do forno)
+//botao para iniciar o modo automatico(so vai ligar quando o potenciometro estiver ajustado, assim começando o processo)
+//mostrar as coisas no LCD}//fim do void
+
